@@ -5,13 +5,17 @@ all:
 	cargo rustc --release -- -C opt-level=3 -C lto
 
 install:
+	mkdir tmp
+	sed "s|_PREFIX_|$(PREFIX)|" assets/systemd-manager-pkexec > tmp/systemd-manager-pkexec
+	sed "s|_PREFIX_|$(PREFIX)|" assets/org.freedesktop.policykit.systemd-manager.policy > tmp/org.freedesktop.policykit.systemd-manager.policy
 	install -d $(target)/bin/
 	install -d $(target)/share/applications/
 	install -d $(target)/share/polkit-1/actions/
 	install -m 755 target/release/systemd-manager $(target)/bin/
-	install -m 755 assets/systemd-manager-pkexec $(target)/bin/
+	install -m 755 tmp/systemd-manager-pkexec $(target)/bin/
+	install -m 644 tmp/org.freedesktop.policykit.systemd-manager.policy $(target)/share/polkit-1/actions/
 	install -m 644 assets/systemd-manager.desktop $(target)/share/applications/
-	install -m 644 assets/org.freedesktop.policykit.systemd-manager.policy $(target)/share/polkit-1/actions/
+	rm -rf tmp
 
 uninstall:
 	rm $(target)/bin/systemd-manager
